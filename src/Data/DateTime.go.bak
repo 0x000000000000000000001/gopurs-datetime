@@ -30,12 +30,22 @@ func CalcDiff(rec1 map[string]interface{}, rec2 map[string]interface{}) float64 
 }
 
 func AdjustImpl(just func(interface{}) interface{}, nothing interface{}, offset float64, rec map[string]interface{}) interface{} {
+	fmt.Printf("AdjustImpl called with offset %f, rec: %v\n", offset, rec)
 	t := createUTC(getInt(rec, "year"), getInt(rec, "month")-1, getInt(rec, "day"), getInt(rec, "hour"), getInt(rec, "minute"), getInt(rec, "second"), getInt(rec, "millisecond"))
-	ms := t.UnixMilli() + int64(offset)
-	dt := time.UnixMilli(ms).UTC()
+	dt := t.Add(time.Duration(offset) * time.Millisecond)
 	
 	resMap := make(map[string]interface{})
 	resMap["year"] = dt.Year()
+	resMap["month"] = int(dt.Month())
+	resMap["day"] = dt.Day()
+	resMap["hour"] = dt.Hour()
+	resMap["minute"] = dt.Minute()
+	resMap["second"] = dt.Second()
+	resMap["millisecond"] = dt.Nanosecond() / 1000000
+	fmt.Printf("AdjustImpl returning: %v\n", resMap)
+	
+	return just(resMap)
+}
 	resMap["month"] = int(dt.Month())
 	resMap["day"] = dt.Day()
 	resMap["hour"] = dt.Hour()
